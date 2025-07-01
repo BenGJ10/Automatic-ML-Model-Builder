@@ -31,7 +31,7 @@ def rf_param_selector(X_train, Y_train):
         logging.info(f"RandomForestClassifier trained in {duration:.3f} seconds")
         return model, duration
     
-    except AutoMLException as e:
+    except Exception as e:
         raise AutoMLException(e, sys)
 
         
