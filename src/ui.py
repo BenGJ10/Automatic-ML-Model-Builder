@@ -87,34 +87,30 @@ def split_data(result):
 def scale_data(result, X_train, X_test):
     try:
         with st.sidebar.expander("Data Scaling", expanded=True):
-            st.write("Select Scaling Method")
-            standard_scaler = st.checkbox("StandardScaler")
-            minmax_scaler = st.checkbox("MinMaxScaler")
-            no_scaling = st.checkbox("None")
+            scaling_method = st.selectbox("Select Scaling Method", ["None", "StandardScaler", "MinMaxScaler"])
             columns = st.text_input("Enter columns to scale (comma-separated)")
             column_list = [col.strip() for col in columns.split(",") if col.strip()]
-            if not columns or no_scaling:
+            if scaling_method == "None" or not columns:
                 logging.info("No scaling applied")
                 return X_train, X_test
-            if standard_scaler and minmax_scaler:
-                st.error("Please select only one scaling method")
-                return X_train, X_test
-            if standard_scaler:
+            for col in column_list:
+                if col not in X_train.columns:
+                    raise AutoMLException(f"Column {col} not found in dataset", sys)
+            if scaling_method == "StandardScaler":
+                scaler = StandardScaler()
                 for col in column_list:
-                    scaler = StandardScaler()
                     X_train[col] = scaler.fit_transform(X_train[col].values.reshape(-1, 1))
                     X_test[col] = scaler.transform(X_test[col].values.reshape(-1, 1))
                 st.write("Scaled X_test preview:", X_test.head())
                 logging.info(f"Applied StandardScaler to columns: {column_list}")
-                return X_train, X_test
-            if minmax_scaler:
+            elif scaling_method == "MinMaxScaler":
+                scaler = MinMaxScaler()
                 for col in column_list:
-                    scaler = MinMaxScaler()
                     X_train[col] = scaler.fit_transform(X_train[col].values.reshape(-1, 1))
                     X_test[col] = scaler.transform(X_test[col].values.reshape(-1, 1))
                 st.write("Scaled X_test preview:", X_test.head())
                 logging.info(f"Applied MinMaxScaler to columns: {column_list}")
-                return X_train, X_test
+            return X_train, X_test
     except Exception as e:
         logging.error(f"Data scaling error: {str(e)}")
         raise AutoMLException(f"Data scaling error: {str(e)}", sys)
