@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"
 
 import time
 import streamlit as st
-from src.logging.logger import logging
+from src.logger.custom_logger import logging
 from src.exception.exception import AutoMLException
 from sklearn.svm import SVR
 
